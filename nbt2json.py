@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import json
-import sys
 from collections.abc import MutableMapping, Sequence
 from typing import Union, Any
 
