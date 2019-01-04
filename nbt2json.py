@@ -29,10 +29,17 @@ def nbt_to_json(filename: str, **dumps_kwargs: dict) -> str:
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--pretty", help="Pretty-print output", action="store_true")
-    parser.add_argument("file", help="NBT file to jsonify")
+    parser.add_argument("--inplace", help="Create JSON files in-place", action="store_true")
+    parser.add_argument("files", help="NBT file to jsonify", nargs="+")
 
     args = parser.parse_args()
 
     kwargs = {"indent": 4} if args.pretty else {}
 
-    print(nbt_to_json(args.file, **kwargs))
+    for file in args.files:
+        if args.inplace:
+            *fname, ext = file.split(".")
+            with open(".".join(fname) + ".json", "w") as f:
+                f.write(nbt_to_json(file, **kwargs))
+        else:
+            print(nbt_to_json(file, **kwargs))
