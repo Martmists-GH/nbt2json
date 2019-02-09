@@ -8,10 +8,38 @@ from nbt.nbt import NBTFile, TAG_List, TAGLIST, TAG_Compound, TAG_Int_Array
 
 class Token:
     def __init__(self, type_, name, value, extra=None):
+        self.__is_set = False
         self.type_ = type_
         self.name = name
         self._value = value if value is None else _to_py(value)
         self.extra = extra
+
+        if self.type_ == TAG_Compound:
+            self.keys = [x.name for x in self._value]
+
+        self.__is_set = True
+
+    def __setattr__(self, key, value):
+        if key == "_Token__is_set" or not self.__is_set:
+            super().__setattr__(key, value)
+
+        elif key == "_value":
+            if not isinstance(self._value, (int, str, float, list)):
+                self._value._value = value
+            else:
+                self._value = value
+
+        elif hasattr(self, "keys") and key in self.keys:
+            item = self[key]
+            item._value = value
+
+    def __getattr__(self, item):
+        if self.__is_set:
+            if item in self.keys:
+                return self[item]
+
+    def __getitem__(self, key):
+        return {x.name: x for x in self._value}[key]
 
     @property
     def value(self):
