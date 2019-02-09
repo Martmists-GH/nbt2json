@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="nbt2json",
@@ -9,10 +9,10 @@ setup(
     version="1.0",
     description="Easy interface for minecraft NBT files",
     url="https://github.com/martmists/NBT2JSON",
-    packages=find_packages(),
+    packages=["nbt2json.py"],
     install_requires=["nbt"],
     entry_points={
-        "console_scripts": ["nbt2json = __init__:main"]
+        "console_scripts": ["nbt2json = nbt2json:main"]
     },
     keywords=["nbt", "python", "json", "tree"],
     classifiers=[
