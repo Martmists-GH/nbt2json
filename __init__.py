@@ -99,7 +99,7 @@ def tree_to_nbt(nbt: Token, filename: str):
     nbt_file.write_file(filename)
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser()
     parser.add_argument("--pretty", help="Pretty-print output", action="store_true")
     parser.add_argument("--inplace", help="Create JSON files in-place", action="store_true")
@@ -116,3 +116,7 @@ if __name__ == "__main__":
                 f.write(nbt_to_json(file, **kwargs))
         else:
             print(nbt_to_json(file, **kwargs))
+
+
+if __name__ == "__main__":
+    main()

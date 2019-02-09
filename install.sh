@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+echo "This method of installing is deprecated!"
+echo "Use 'python -m pip install .' instead!"
+echo "If you REALLY need this method, remove line 6 in this file."
+exit 1
+
 if [[ "$(id -u)" != "0" ]]; then
    echo "Make sure to run this with sudo or as root, or it won't work!"
    exit 1
