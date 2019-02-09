@@ -6,10 +6,10 @@ setup(
     author_email="mail@martmists.com",
     license="MIT",
     zip_safe=False,
-    version="1.0",
+    version="1.1",
     description="Easy interface for minecraft NBT files",
     url="https://github.com/martmists/NBT2JSON",
-    packages=["nbt2json.py"],
+    packages=["."],
     install_requires=["nbt"],
     entry_points={
         "console_scripts": ["nbt2json = nbt2json:main"]
