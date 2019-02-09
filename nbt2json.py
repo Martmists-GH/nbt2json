@@ -89,6 +89,16 @@ def nbt_to_json(filename: str, **dumps_kwargs: dict) -> str:
     return json.dumps(py.as_dict, **dumps_kwargs)
 
 
+def nbt_to_tree(filename: str) -> Token:
+    nbt = NBTFile(filename)
+    return _to_py(nbt)
+
+
+def tree_to_nbt(nbt: Token, filename: str):
+    nbt_file = nbt.value
+    nbt_file.write_file(filename)
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--pretty", help="Pretty-print output", action="store_true")
