@@ -1,29 +1,92 @@
 #!/usr/bin/python3
-
 import json
-from collections.abc import MutableMapping, Sequence
 from typing import Union, Any
 
 from argparse import ArgumentParser
-from nbt.nbt import NBTFile, _TAG_Numeric, TAG_String
+from nbt.nbt import NBTFile, TAG_List, TAGLIST, TAG_Compound, TAG_Int_Array
 
 
-def _to_py(x: Any) -> Union[dict, str, list, int]:
-    if isinstance(x, (str, int)):
+class Token:
+    def __init__(self, type_, name, value, extra=None):
+        self.type_ = type_
+        self.name = name
+        self._value = value if value is None else _to_py(value)
+        self.extra = extra
+
+    @property
+    def value(self):
+        if self.type_ in (float, int, str):
+            return self._value
+
+        if self.type_ == list:
+            tag = TAG_Compound(self.name)
+            tag.tags = [x.value for x in self._value]
+            return tag
+
+        if self.type_ == NBTFile:
+            x = NBTFile()
+            x.name = self.name
+            x.tags = [x.value for x in self._value]
+            return x
+
+        if self.type_ == TAG_Compound:
+            tag = TAG_Compound(name=self.name)
+            tag.tags = [x.value for x in self._value]
+            tag.name = self.name
+            return tag
+
+        if self.type_ == TAG_Int_Array:
+            tag = TAG_Int_Array(name=self.name)
+            tag.value = self._value
+            return tag
+
+        if self.type_ == TAG_List:
+            tag = TAG_List(type=self.extra, name=self.name)
+            tag.tags = [x.value for x in self._value]
+            tag.name = self.name
+            return tag
+
+        return self.type_(value=self._value, name=self.name)
+
+    @property
+    def cls_name(self):
+        return self.type_.__name__ + (f"[{self.extra.__name__}, {self.name}]" if self.extra else f"[{self.name}]")
+
+    @property
+    def as_dict(self):
+        if issubclass(self.type_, TAG_Compound):
+            return {x.name: x.as_dict for x in self._value}
+
+        if issubclass(self.type_, TAG_List):
+            return [x.as_dict for x in self._value]
+
+        return self._value
+
+    def __repr__(self):
+        return f"{self.cls_name}({self.name or 'value'}={self._value})"
+
+    @property
+    def py(self):
+        return self.value
+
+
+def _to_py(x: Any) -> Union[Token, str, int, float, list]:
+    if isinstance(x, TAG_Compound):
+        return Token(TAG_Compound, x.name, x.tags)
+    elif isinstance(x, TAG_List):
+        return Token(TAG_List, x.name, x.tags, TAGLIST[x.tagID])
+    elif isinstance(x, (str, int, float)):
         return x
-    if isinstance(x, (_TAG_Numeric, TAG_String)):
-        return x.value
-    if isinstance(x, (list, Sequence)):
+    elif isinstance(x, list):
         return [_to_py(y) for y in x]
-    if isinstance(x, (dict, MutableMapping)):
-        return {_to_py(k): _to_py(v)
-                for k, v in x.items()}
+    else:
+        return Token(x.__class__, x.name, x.value if x.value is not None else x.tags)
 
 
 def nbt_to_json(filename: str, **dumps_kwargs: dict) -> str:
     nbt = NBTFile(filename)
     py = _to_py(nbt)
-    return json.dumps(py, **dumps_kwargs)
+    return json.dumps(py.as_dict, **dumps_kwargs)
 
 
 if __name__ == "__main__":
