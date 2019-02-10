@@ -27,7 +27,7 @@ class Token:
             if not isinstance(self._value, (int, str, float, list)):
                 self._value._value = value
             else:
-                super().__setattr__(self, "_value", value)
+                super().__setattr__("_value", value)
 
         elif hasattr(self, "keys") and key in self.keys:
             item = self[key]

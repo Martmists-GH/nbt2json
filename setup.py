@@ -6,7 +6,7 @@ setup(
     author_email="mail@martmists.com",
     license="MIT",
     zip_safe=False,
-    version="1.1",
+    version="1.2",
     description="Easy interface for minecraft NBT files",
     url="https://github.com/martmists/NBT2JSON",
     packages=["."],
