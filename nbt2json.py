@@ -34,7 +34,7 @@ class Token:
             item._value = value
 
     def __getattr__(self, item):
-        if self.__is_set:
+        if self.type_ == TAG_Compound and self.__is_set:
             if item in self.keys:
                 return self[item]
         super().__getattribute__(item)
