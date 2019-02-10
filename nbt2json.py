@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import json
+import textwrap
 from typing import Union, Any
 
 from argparse import ArgumentParser
@@ -10,7 +11,7 @@ class Token:
     def __init__(self, type_, name, value, extra=None):
         self.__is_set = False
         self.type_ = type_
-        self.name = name
+        self.name = name or ""
         self._value = value if value is None else _to_py(value)
         self.extra = extra
 
@@ -83,7 +84,12 @@ class Token:
 
     @property
     def cls_name(self):
-        return self.type_.__name__ + (f"[{self.extra.__name__}, {self.name}]" if self.extra else f"[{self.name}]")
+        if self.extra:
+            return self.type_.__name__ + f"[{self.extra.__name__}, {self.name}]"
+        elif self.name:
+            return self.type_.__name__ + f"[{self.name}]"
+        else:
+            return self.type_.__name__
 
     @property
     def as_dict(self):
@@ -96,7 +102,10 @@ class Token:
         return self._value
 
     def __repr__(self):
-        return f"{self.cls_name}({self.name or 'value'}={self._value})"
+        body = (("[\n" + textwrap.indent(",\n".join(repr(x) for x in self._value), "    ") + "\n]") \
+                if isinstance(self._value, list) and self._value
+                else self._value)
+        return f"{self.cls_name}({self.name or 'value'}={body})"
 
     @property
     def py(self):
