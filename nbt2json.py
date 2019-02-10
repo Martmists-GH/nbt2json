@@ -47,7 +47,7 @@ class Token:
 
     def __setitem__(self, key, value):
         if self.type_ == TAG_List:
-            self._value[key] = value
+            self._value[key]._value = value
 
     @property
     def value(self):
