@@ -51,9 +51,6 @@ class Token:
 
     @property
     def value(self):
-        if self.type_ in (float, int, str):
-            return self._value
-
         if self.type_ == list:
             tag = TAG_Compound(self.name)
             tag.tags = [x.value for x in self._value]
@@ -131,7 +128,8 @@ def nbt_to_tree(filename: str) -> Token:
 
 
 def tree_to_nbt(nbt: Token, filename: str):
-    nbt_file = nbt.value
+    nbt_file = NBTFile()
+    nbt_file.tags = [x.value for x in nbt._value]  # Fix this
     nbt_file.write_file(filename)
 
 
