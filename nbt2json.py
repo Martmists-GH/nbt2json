@@ -37,9 +37,17 @@ class Token:
         if self.__is_set:
             if item in self.keys:
                 return self[item]
+        super().__getattribute__(item)
 
     def __getitem__(self, key):
-        return {x.name: x for x in self._value}[key]
+        if self.type_ == TAG_Compound:
+            return {x.name: x for x in self._value}[key]
+        elif self.type_ == TAG_List:
+            return self._value[key]
+
+    def __setitem__(self, key, value):
+        if self.type_ == TAG_List:
+            self._value[key] = value
 
     @property
     def value(self):
